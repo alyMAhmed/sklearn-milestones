@@ -12,6 +12,8 @@ import numpy as np
 from joblib import effective_n_jobs
 from scipy import sparse
 
+from sklearn.utils import metadata_routing
+
 from ..base import MultiOutputMixin, RegressorMixin, _fit_context
 from ..model_selection import check_cv
 from ..utils import Bunch, check_array, check_scalar
@@ -871,6 +873,10 @@ class ElasticNet(MultiOutputMixin, RegressorMixin, LinearModel):
     [1.451...]
     """
 
+    # "check_input" is used for optimisation and isn't something to be passed
+    # around in a pipeline.
+    __metadata_request__fit = {"check_input": metadata_routing.UNUSED}
+
     _parameter_constraints: dict = {
         "alpha": [Interval(Real, 0, None, closed="left")],
         "l1_ratio": [Interval(Real, 0, 1, closed="both")],
@@ -975,6 +981,7 @@ class ElasticNet(MultiOutputMixin, RegressorMixin, LinearModel):
                 accept_sparse="csc",
                 order="F",
                 dtype=[np.float64, np.float32],
+                force_writeable=True,
                 accept_large_sparse=False,
                 copy=X_copied,
                 multi_output=True,
@@ -1603,6 +1610,7 @@ class LinearModelCV(MultiOutputMixin, LinearModel, ABC):
             check_X_params = dict(
                 accept_sparse="csc",
                 dtype=[np.float64, np.float32],
+                force_writeable=True,
                 copy=False,
                 accept_large_sparse=False,
             )
@@ -1628,6 +1636,7 @@ class LinearModelCV(MultiOutputMixin, LinearModel, ABC):
                 accept_sparse="csc",
                 dtype=[np.float64, np.float32],
                 order="F",
+                force_writeable=True,
                 copy=copy_X,
             )
             X, y = self._validate_data(
@@ -2505,6 +2514,7 @@ class MultiTaskElasticNet(Lasso):
         check_X_params = dict(
             dtype=[np.float64, np.float32],
             order="F",
+            force_writeable=True,
             copy=self.copy_X and self.fit_intercept,
         )
         check_y_params = dict(ensure_2d=False, order="F")

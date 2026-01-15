@@ -9,6 +9,8 @@ import numpy as np
 from scipy import optimize, sparse, stats
 from scipy.special import boxcox, inv_boxcox
 
+from sklearn.utils import metadata_routing
+
 from ..base import (
     BaseEstimator,
     ClassNamePrefixFeaturesOutMixin,
@@ -529,6 +531,7 @@ class MinMaxScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             X,
             copy=self.copy,
             dtype=_array_api.supported_float_dtypes(xp),
+            force_writeable=True,
             force_all_finite="allow-nan",
             reset=False,
         )
@@ -560,6 +563,7 @@ class MinMaxScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             X,
             copy=self.copy,
             dtype=_array_api.supported_float_dtypes(xp),
+            force_writeable=True,
             force_all_finite="allow-nan",
         )
 
@@ -1040,6 +1044,7 @@ class StandardScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             accept_sparse="csr",
             copy=copy,
             dtype=FLOAT_DTYPES,
+            force_writeable=True,
             force_all_finite="allow-nan",
         )
 
@@ -1081,6 +1086,7 @@ class StandardScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             accept_sparse="csr",
             copy=copy,
             dtype=FLOAT_DTYPES,
+            force_writeable=True,
             force_all_finite="allow-nan",
         )
 
@@ -1285,6 +1291,7 @@ class MaxAbsScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             copy=self.copy,
             reset=False,
             dtype=_array_api.supported_float_dtypes(xp),
+            force_writeable=True,
             force_all_finite="allow-nan",
         )
 
@@ -1316,6 +1323,7 @@ class MaxAbsScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             accept_sparse=("csr", "csc"),
             copy=self.copy,
             dtype=_array_api.supported_float_dtypes(xp),
+            force_writeable=True,
             force_all_finite="allow-nan",
         )
 
@@ -1648,6 +1656,7 @@ class RobustScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             accept_sparse=("csr", "csc"),
             copy=self.copy,
             dtype=FLOAT_DTYPES,
+            force_writeable=True,
             reset=False,
             force_all_finite="allow-nan",
         )
@@ -1681,6 +1690,7 @@ class RobustScaler(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             accept_sparse=("csr", "csc"),
             copy=self.copy,
             dtype=FLOAT_DTYPES,
+            force_writeable=True,
             force_all_finite="allow-nan",
         )
 
@@ -1922,6 +1932,7 @@ def normalize(X, norm="l2", *, axis=1, copy=True, return_norm=False):
         copy=copy,
         estimator="the normalize function",
         dtype=_array_api.supported_float_dtypes(xp),
+        force_writeable=True,
     )
     if axis == 0:
         X = X.T
@@ -2085,8 +2096,10 @@ class Normalizer(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             Transformed array.
         """
         copy = copy if copy is not None else self.copy
-        X = self._validate_data(X, accept_sparse="csr", reset=False)
-        return normalize(X, norm=self.norm, axis=1, copy=copy)
+        X = self._validate_data(
+            X, accept_sparse="csr", force_writeable=True, copy=copy, reset=False
+        )
+        return normalize(X, norm=self.norm, axis=1, copy=False)
 
     def _more_tags(self):
         return {"stateless": True, "array_api_support": True}
@@ -2140,7 +2153,7 @@ def binarize(X, *, threshold=0.0, copy=True):
     array([[0., 1., 0.],
            [1., 0., 0.]])
     """
-    X = check_array(X, accept_sparse=["csr", "csc"], copy=copy)
+    X = check_array(X, accept_sparse=["csr", "csc"], force_writeable=True, copy=copy)
     if sparse.issparse(X):
         if threshold < 0:
             raise ValueError("Cannot binarize a sparse matrix with threshold < 0")
@@ -2281,7 +2294,13 @@ class Binarizer(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
         copy = copy if copy is not None else self.copy
         # TODO: This should be refactored because binarize also calls
         # check_array
-        X = self._validate_data(X, accept_sparse=["csr", "csc"], copy=copy, reset=False)
+        X = self._validate_data(
+            X,
+            accept_sparse=["csr", "csc"],
+            force_writeable=True,
+            copy=copy,
+            reset=False,
+        )
         return binarize(X, threshold=self.threshold, copy=False)
 
     def _more_tags(self):
@@ -2365,6 +2384,10 @@ class KernelCenterer(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEsti
            [  0.,  14., -14.],
            [ -5., -14.,  19.]])
     """
+
+    # X is called K in these methods.
+    __metadata_request__transform = {"K": metadata_routing.UNUSED}
+    __metadata_request__fit = {"K": metadata_routing.UNUSED}
 
     def fit(self, K, y=None):
         """Fit KernelCenterer.
@@ -2842,6 +2865,9 @@ class QuantileTransformer(OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
             accept_sparse="csc",
             copy=copy,
             dtype=FLOAT_DTYPES,
+            # only set force_writeable for the validation at transform time because
+            # it's the only place where QuantileTransformer performs inplace operations.
+            force_writeable=True if not in_fit else None,
             force_all_finite="allow-nan",
         )
         # we only accept positive sparse matrix when ignore_implicit_zeros is
@@ -3469,6 +3495,7 @@ class PowerTransformer(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
             X,
             ensure_2d=True,
             dtype=FLOAT_DTYPES,
+            force_writeable=True,
             copy=self.copy,
             force_all_finite="allow-nan",
             reset=in_fit,

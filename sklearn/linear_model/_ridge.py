@@ -1241,6 +1241,7 @@ class Ridge(MultiOutputMixin, RegressorMixin, _BaseRidge):
             y,
             accept_sparse=_accept_sparse,
             dtype=[xp.float64, xp.float32],
+            force_writeable=True,
             multi_output=True,
             y_numeric=True,
         )
@@ -1290,6 +1291,7 @@ class _RidgeClassifierMixin(LinearClassifierMixin):
             accept_sparse=accept_sparse,
             multi_output=True,
             y_numeric=False,
+            force_writeable=True,
         )
 
         self._label_binarizer = LabelBinarizer(pos_label=1, neg_label=-1)
@@ -2129,8 +2131,6 @@ class _RidgeGCV(LinearModel):
 
         X_mean, *decomposition = decompose(X, y, sqrt_sw)
 
-        scorer = self._get_scorer()
-
         n_y = 1 if len(y.shape) == 1 else y.shape[1]
         n_alphas = 1 if np.ndim(self.alphas) == 0 else len(self.alphas)
 
@@ -2141,7 +2141,7 @@ class _RidgeGCV(LinearModel):
 
         for i, alpha in enumerate(np.atleast_1d(self.alphas)):
             G_inverse_diag, c = solve(float(alpha), y, sqrt_sw, X_mean, *decomposition)
-            if scorer is None:
+            if self.scoring is None:
                 squared_errors = (c / G_inverse_diag) ** 2
                 alpha_score = self._score_without_scorer(squared_errors=squared_errors)
                 if self.store_cv_results:
@@ -2164,7 +2164,7 @@ class _RidgeGCV(LinearModel):
                     predictions=predictions,
                     y=unscaled_y,
                     n_y=n_y,
-                    scorer=scorer,
+                    scorer=self.scoring,
                     score_params=score_params,
                 )
 
@@ -2210,9 +2210,6 @@ class _RidgeGCV(LinearModel):
             self.cv_results_ = self.cv_results_.reshape(cv_results_shape)
 
         return self
-
-    def _get_scorer(self):
-        return check_scoring(self, scoring=self.scoring, allow_none=True)
 
     def _score_without_scorer(self, squared_errors):
         """Performs scoring using squared errors when the scorer is None."""
@@ -2329,6 +2326,7 @@ class _BaseRidgeCV(LinearModel):
         """
         _raise_for_params(params, self, "fit")
         cv = self.cv
+        scorer = self._get_scorer()
 
         # TODO(1.7): Remove in 1.7
         # Also change `store_cv_results` default back to False
@@ -2392,10 +2390,14 @@ class _BaseRidgeCV(LinearModel):
                 if sample_weight is not None:
                     routed_params.scorer.score["sample_weight"] = sample_weight
 
+            # reset `scorer` variable to original user-intend if no scoring is passed
+            if self.scoring is None:
+                scorer = None
+
             estimator = _RidgeGCV(
                 alphas,
                 fit_intercept=self.fit_intercept,
-                scoring=self.scoring,
+                scoring=scorer,
                 gcv_mode=self.gcv_mode,
                 store_cv_results=self._store_cv_results,
                 is_clf=is_classifier(self),
@@ -2431,7 +2433,7 @@ class _BaseRidgeCV(LinearModel):
                 estimator,
                 parameters,
                 cv=cv,
-                scoring=self.scoring,
+                scoring=scorer,
             )
 
             grid_search.fit(X, y, **params)
@@ -2465,14 +2467,25 @@ class _BaseRidgeCV(LinearModel):
             MetadataRouter(owner=self.__class__.__name__)
             .add_self_request(self)
             .add(
-                scorer=self._get_scorer(),
-                method_mapping=MethodMapping().add(callee="score", caller="fit"),
+                scorer=self.scoring,
+                method_mapping=MethodMapping().add(caller="fit", callee="score"),
+            )
+            .add(
+                splitter=self.cv,
+                method_mapping=MethodMapping().add(caller="fit", callee="split"),
             )
         )
         return router
 
     def _get_scorer(self):
-        return check_scoring(self, scoring=self.scoring, allow_none=True)
+        scorer = check_scoring(estimator=self, scoring=self.scoring, allow_none=True)
+        if _routing_enabled() and self.scoring is None:
+            # This estimator passes an array of 1s as sample_weight even if
+            # sample_weight is not provided by the user. Therefore we need to
+            # always request it. But we don't set it if it's passed explicitly
+            # by the user.
+            scorer.set_score_request(sample_weight=True)
+        return scorer
 
     # TODO(1.7): Remove
     # mypy error: Decorated property not supported

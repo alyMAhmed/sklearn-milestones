@@ -263,10 +263,19 @@ class _PLS(
 
         check_consistent_length(X, y)
         X = self._validate_data(
-            X, dtype=np.float64, copy=self.copy, ensure_min_samples=2
+            X,
+            dtype=np.float64,
+            force_writeable=True,
+            copy=self.copy,
+            ensure_min_samples=2,
         )
         y = check_array(
-            y, input_name="y", dtype=np.float64, copy=self.copy, ensure_2d=False
+            y,
+            input_name="y",
+            dtype=np.float64,
+            force_writeable=True,
+            copy=self.copy,
+            ensure_2d=False,
         )
         if y.ndim == 1:
             self._predict_1d = True
@@ -1058,10 +1067,19 @@ class PLSSVD(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         y = _deprecate_Y_when_required(y, Y)
         check_consistent_length(X, y)
         X = self._validate_data(
-            X, dtype=np.float64, copy=self.copy, ensure_min_samples=2
+            X,
+            dtype=np.float64,
+            force_writeable=True,
+            copy=self.copy,
+            ensure_min_samples=2,
         )
         y = check_array(
-            y, input_name="y", dtype=np.float64, copy=self.copy, ensure_2d=False
+            y,
+            input_name="y",
+            dtype=np.float64,
+            force_writeable=True,
+            copy=self.copy,
+            ensure_2d=False,
         )
         if y.ndim == 1:
             y = y.reshape(-1, 1)
