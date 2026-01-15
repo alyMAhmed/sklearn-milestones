@@ -131,7 +131,6 @@ display = RocCurveDisplay.from_predictions(
     name=f"{class_of_interest} vs the rest",
     color="darkorange",
     plot_chance_level=True,
-    despine=True,
 )
 _ = display.ax_.set(
     xlabel="False Positive Rate",
@@ -167,7 +166,6 @@ display = RocCurveDisplay.from_predictions(
     name="micro-average OvR",
     color="darkorange",
     plot_chance_level=True,
-    despine=True,
 )
 _ = display.ax_.set(
     xlabel="False Positive Rate",
@@ -287,7 +285,6 @@ for class_id, color in zip(range(n_classes), colors):
         color=color,
         ax=ax,
         plot_chance_level=(class_id == 2),
-        despine=True,
     )
 
 _ = ax.set(
@@ -369,7 +366,6 @@ for ix, (label_a, label_b) in enumerate(pair_list):
         ax=ax,
         name=f"{label_b} as positive class",
         plot_chance_level=True,
-        despine=True,
     )
     ax.set(
         xlabel="False Positive Rate",

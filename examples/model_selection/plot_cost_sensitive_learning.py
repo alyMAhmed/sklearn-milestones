@@ -660,18 +660,15 @@ print(
 #
 # The class :class:`~sklearn.model_selection.FixedThresholdClassifier` allows us to
 # manually set the decision threshold. At prediction time, it behave as the previous
-# tuned model but no search is performed during the fitting process. Note that here
-# we use :class:`~sklearn.frozen.FrozenEstimator` to wrap the predictive model to
-# avoid any refitting.
+# tuned model but no search is performed during the fitting process.
 #
 # Here, we will reuse the decision threshold found in the previous section to create a
 # new model and check that it gives the same results.
-from sklearn.frozen import FrozenEstimator
 from sklearn.model_selection import FixedThresholdClassifier
 
 model_fixed_threshold = FixedThresholdClassifier(
-    estimator=FrozenEstimator(model), threshold=tuned_model.best_threshold_
-)
+    estimator=model, threshold=tuned_model.best_threshold_, prefit=True
+).fit(data_train, target_train)
 
 # %%
 business_score = business_scorer(

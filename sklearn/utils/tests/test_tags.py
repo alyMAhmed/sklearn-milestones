@@ -1,10 +1,6 @@
 import pytest
 
-from sklearn.base import (
-    BaseEstimator,
-    RegressorMixin,
-    TransformerMixin,
-)
+from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin
 from sklearn.utils._tags import get_tags
 
 
@@ -17,22 +13,13 @@ class ClassifierEstimator:
     _estimator_type = "classifier"
 
 
-class EmptyTransformer(TransformerMixin, BaseEstimator):
-    pass
-
-
-class EmptyRegressor(RegressorMixin, BaseEstimator):
-    pass
-
-
-@pytest.mark.filterwarnings("ignore:.*no __sklearn_tags__ attribute.*:FutureWarning")
 @pytest.mark.parametrize(
     "estimator, value",
     [
         [NoTagsEstimator(), False],
         [ClassifierEstimator(), True],
-        [EmptyTransformer(), False],
-        [EmptyRegressor(), True],
+        [TransformerMixin(), False],
+        [RegressorMixin(), True],
         [BaseEstimator(), False],
     ],
 )

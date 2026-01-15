@@ -2686,8 +2686,7 @@ def test_regression_tree_missing_values_toy(Tree, X, criterion):
     tree = Tree(criterion=criterion, random_state=0).fit(X, y)
     tree_ref = clone(tree).fit(y.reshape(-1, 1), y)
 
-    impurity = tree.tree_.impurity
-    assert all(impurity >= 0), impurity.min()  # MSE should always be positive
+    assert all(tree.tree_.impurity >= 0)  # MSE should always be positive
 
     # Note: the impurity matches after the first split only on greedy trees
     if Tree is DecisionTreeRegressor:
