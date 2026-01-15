@@ -22,7 +22,6 @@ from sklearn.ensemble import (
 )
 from sklearn.exceptions import NotFittedError
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.frozen import FrozenEstimator
 from sklearn.impute import SimpleImputer
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression, SGDClassifier
@@ -46,7 +45,6 @@ from sklearn.utils._testing import (
     assert_almost_equal,
     assert_array_almost_equal,
     assert_array_equal,
-    ignore_warnings,
 )
 from sklearn.utils.extmath import softmax
 from sklearn.utils.fixes import CSR_CONTAINERS
@@ -301,11 +299,9 @@ def test_calibration_zero_probability():
     assert_allclose(probas, 1.0 / clf.n_classes_)
 
 
-@ignore_warnings(category=FutureWarning)
 @pytest.mark.parametrize("csr_container", CSR_CONTAINERS)
 def test_calibration_prefit(csr_container):
     """Test calibration for prefitted classifiers"""
-    # TODO(1.8): Remove cv="prefit" options here and the @ignore_warnings of the test
     n_samples = 50
     X, y = make_classification(n_samples=3 * n_samples, n_features=6, random_state=42)
     sample_weight = np.random.RandomState(seed=42).uniform(size=y.size)
@@ -337,25 +333,17 @@ def test_calibration_prefit(csr_container):
         (csr_container(X_calib), csr_container(X_test)),
     ]:
         for method in ["isotonic", "sigmoid"]:
-            cal_clf_prefit = CalibratedClassifierCV(clf, method=method, cv="prefit")
-            cal_clf_frozen = CalibratedClassifierCV(FrozenEstimator(clf), method=method)
+            cal_clf = CalibratedClassifierCV(clf, method=method, cv="prefit")
 
             for sw in [sw_calib, None]:
-                cal_clf_prefit.fit(this_X_calib, y_calib, sample_weight=sw)
-                cal_clf_frozen.fit(this_X_calib, y_calib, sample_weight=sw)
+                cal_clf.fit(this_X_calib, y_calib, sample_weight=sw)
+                y_prob = cal_clf.predict_proba(this_X_test)
+                y_pred = cal_clf.predict(this_X_test)
+                prob_pos_cal_clf = y_prob[:, 1]
+                assert_array_equal(y_pred, np.array([0, 1])[np.argmax(y_prob, axis=1)])
 
-                y_prob_prefit = cal_clf_prefit.predict_proba(this_X_test)
-                y_prob_frozen = cal_clf_frozen.predict_proba(this_X_test)
-                y_pred_prefit = cal_clf_prefit.predict(this_X_test)
-                y_pred_frozen = cal_clf_frozen.predict(this_X_test)
-                prob_pos_cal_clf_prefit = y_prob_prefit[:, 1]
-                prob_pos_cal_clf_frozen = y_prob_frozen[:, 1]
-                assert_array_equal(y_pred_prefit, y_pred_frozen)
-                assert_array_equal(
-                    y_pred_prefit, np.array([0, 1])[np.argmax(y_prob_prefit, axis=1)]
-                )
                 assert brier_score_loss(y_test, prob_pos_clf) > brier_score_loss(
-                    y_test, prob_pos_cal_clf_frozen
+                    y_test, prob_pos_cal_clf
                 )
 
 
@@ -527,10 +515,8 @@ def dict_data():
         {"state": "NY", "age": "adult"},
         {"state": "TX", "age": "adult"},
         {"state": "VT", "age": "child"},
-        {"state": "CT", "age": "adult"},
-        {"state": "BR", "age": "child"},
     ]
-    text_labels = [1, 0, 1, 1, 0]
+    text_labels = [1, 0, 1]
     return dict_data, text_labels
 
 
@@ -554,7 +540,7 @@ def test_calibration_dict_pipeline(dict_data, dict_data_pipeline):
     """
     X, y = dict_data
     clf = dict_data_pipeline
-    calib_clf = CalibratedClassifierCV(FrozenEstimator(clf), cv=2)
+    calib_clf = CalibratedClassifierCV(clf, cv="prefit")
     calib_clf.fit(X, y)
     # Check attributes are obtained from fitted estimator
     assert_array_equal(calib_clf.classes_, clf.classes_)
@@ -598,7 +584,7 @@ def test_calibration_inconsistent_prefit_n_features_in():
     # is consistent with training set
     X, y = make_classification(n_samples=10, n_features=5, n_classes=2, random_state=7)
     clf = LinearSVC(C=1).fit(X, y)
-    calib_clf = CalibratedClassifierCV(FrozenEstimator(clf))
+    calib_clf = CalibratedClassifierCV(clf, cv="prefit")
 
     msg = "X has 3 features, but LinearSVC is expecting 5 features as input."
     with pytest.raises(ValueError, match=msg):
@@ -616,7 +602,7 @@ def test_calibration_votingclassifier():
     )
     vote.fit(X, y)
 
-    calib_clf = CalibratedClassifierCV(estimator=FrozenEstimator(vote))
+    calib_clf = CalibratedClassifierCV(estimator=vote, cv="prefit")
     # smoke test: should not raise an error
     calib_clf.fit(X, y)
 

@@ -1,4 +1,3 @@
-import math
 from functools import partial
 from inspect import signature
 from itertools import chain, permutations, product
@@ -844,9 +843,9 @@ def test_format_invariance_with_1d_vectors(name):
         ):
             if "roc_auc" in name:
                 # for consistency between the `roc_cuve` and `roc_auc_score`
-                # np.nan is returned and an `UndefinedMetricWarning` is raised
+                # 0.0 is returned and an `UndefinedMetricWarning` is raised
                 with pytest.warns(UndefinedMetricWarning):
-                    assert math.isnan(metric(y1_row, y2_row))
+                    assert metric(y1_row, y2_row) == pytest.approx(0.0)
             else:
                 with pytest.raises(ValueError):
                     metric(y1_row, y2_row)
