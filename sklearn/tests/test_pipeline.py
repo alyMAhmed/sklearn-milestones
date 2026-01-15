@@ -51,7 +51,7 @@ from sklearn.utils._testing import (
     assert_array_equal,
 )
 from sklearn.utils.fixes import CSR_CONTAINERS
-from sklearn.utils.validation import _check_feature_names, check_is_fitted
+from sklearn.utils.validation import check_is_fitted
 
 iris = load_iris()
 
@@ -1359,7 +1359,7 @@ def test_make_pipeline_memory():
 
 class FeatureNameSaver(BaseEstimator):
     def fit(self, X, y=None):
-        _check_feature_names(self, X, reset=True)
+# [ENV-PATCH]         _check_feature_names(self, X, reset=True)
         return self
 
     def transform(self, X, y=None):

@@ -35,7 +35,6 @@ from sklearn.utils._testing import (
     _convert_container,
     assert_array_equal,
 )
-from sklearn.utils.validation import _check_n_features, validate_data
 
 
 #############################################################################
@@ -685,6 +684,7 @@ def test_repr_html_wraps():
             output = tree._repr_html_()
 
 
+@pytest.mark.skip(reason="[ENV-PATCH] _check_n_features not available in M03")
 def test_n_features_in_validation():
     """Check that `_check_n_features` validates data when reset=False"""
     est = MyEstimator()
@@ -698,6 +698,7 @@ def test_n_features_in_validation():
         _check_n_features(est, "invalid X", reset=False)
 
 
+@pytest.mark.skip(reason="[ENV-PATCH] _check_n_features not available in M03")
 def test_n_features_in_no_validation():
     """Check that `_check_n_features` does not validate data when
     n_features_in_ is not defined."""
@@ -710,6 +711,7 @@ def test_n_features_in_no_validation():
     _check_n_features(est, "invalid X", reset=False)
 
 
+@pytest.mark.skip(reason="[ENV-PATCH] validate_data not available in M03")
 def test_feature_names_in():
     """Check that feature_name_in are recorded by `_validate_data`"""
     pd = pytest.importorskip("pandas")
@@ -788,6 +790,7 @@ def test_feature_names_in():
         trans.transform(df_mixed)
 
 
+@pytest.mark.skip(reason="[ENV-PATCH] validate_data not available in M03")
 def test_validate_data_skip_check_array():
     """Check skip_check_array option of _validate_data."""
 
