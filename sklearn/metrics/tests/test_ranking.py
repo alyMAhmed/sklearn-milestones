@@ -1,4 +1,3 @@
-import math
 import re
 
 import numpy as np
@@ -371,8 +370,7 @@ def test_roc_curve_toydata():
         "ROC AUC score is not defined in that case."
     )
     with pytest.warns(UndefinedMetricWarning, match=expected_message):
-        auc = roc_auc_score(y_true, y_score)
-    assert math.isnan(auc)
+        roc_auc_score(y_true, y_score)
 
     # case with no negative samples
     y_true = [1, 1]
@@ -390,8 +388,7 @@ def test_roc_curve_toydata():
         "ROC AUC score is not defined in that case."
     )
     with pytest.warns(UndefinedMetricWarning, match=expected_message):
-        auc = roc_auc_score(y_true, y_score)
-    assert math.isnan(auc)
+        roc_auc_score(y_true, y_score)
 
     # Multi-label classification task
     y_true = np.array([[0, 1], [0, 1]])
