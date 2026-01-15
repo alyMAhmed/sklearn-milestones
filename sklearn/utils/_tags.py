@@ -1,3 +1,72 @@
+from __future__ import annotations
+from dataclasses import dataclass, field
+
+@dataclass(slots=True)
+class InputTags:
+    one_d_array: bool = False
+    two_d_array: bool = True
+    three_d_array: bool = False
+    sparse: bool = False
+    categorical: bool = False
+    string: bool = False
+    dict: bool = False
+    positive_only: bool = False
+    allow_nan: bool = False
+    pairwise: bool = False
+
+@dataclass(slots=True)
+class TargetTags:
+    required: bool
+    one_d_labels: bool = False
+    two_d_labels: bool = False
+    positive_only: bool = False
+    multi_output: bool = False
+    single_output: bool = True
+
+@dataclass(slots=True)
+class TransformerTags:
+    preserves_dtype: list[str] = field(default_factory=lambda: ["float64"])
+
+@dataclass(slots=True)
+class ClassifierTags:
+    poor_score: bool = False
+    multi_class: bool = True
+    multi_label: bool = False
+
+@dataclass(slots=True)
+class RegressorTags:
+    poor_score: bool = False
+
+@dataclass(slots=True)
+class Tags:
+    estimator_type: str | None
+    target_tags: TargetTags
+    transformer_tags: TransformerTags | None = None
+    classifier_tags: ClassifierTags | None = None
+    regressor_tags: RegressorTags | None = None
+    array_api_support: bool = False
+    no_validation: bool = False
+    non_deterministic: bool = False
+    requires_fit: bool = True
+    _skip_test: bool = False
+    input_tags: InputTags = field(default_factory=InputTags)
+
+def default_tags(estimator) -> Tags:
+    est_is_classifier = getattr(estimator, "_estimator_type", None) == "classifier"
+    est_is_regressor = getattr(estimator, "_estimator_type", None) == "regressor"
+    target_required = est_is_classifier or est_is_regressor
+    return Tags(
+        estimator_type=getattr(estimator, "_estimator_type", None),
+        target_tags=TargetTags(required=target_required),
+        transformer_tags=(
+            TransformerTags()
+            if hasattr(estimator, "transform") or hasattr(estimator, "fit_transform")
+            else None
+        ),
+        classifier_tags=ClassifierTags() if est_is_classifier else None,
+        regressor_tags=RegressorTags() if est_is_regressor else None,
+    )
+
 import numpy as np
 
 _DEFAULT_TAGS = {
