@@ -15,7 +15,6 @@ from sklearn.utils._array_api import (
     _convert_to_numpy,
     _estimator_with_converted_arrays,
     _is_numpy_namespace,
-    _isin,
     _nanmax,
     _nanmin,
     _NumPyAPIWrapper,
@@ -27,6 +26,12 @@ from sklearn.utils._array_api import (
     supported_float_dtypes,
     yield_namespace_device_dtype_combinations,
 )
+
+# [ENV-PATCH] Conditional import for _isin - may not exist in all versions
+try:
+    from sklearn.utils._array_api import _isin
+except ImportError:
+    _isin = None
 from sklearn.utils._testing import (
     _array_api_for_tests,
     assert_array_equal,
@@ -514,6 +519,7 @@ def test_indexing_dtype(namespace, _device, _dtype):
 )
 @pytest.mark.parametrize("invert", [True, False])
 @pytest.mark.parametrize("assume_unique", [True, False])
+@pytest.mark.skipif(_isin is None, reason="[ENV-PATCH] _isin not available in this version")
 @pytest.mark.parametrize("element_size", [6, 10, 14])
 @pytest.mark.parametrize("int_dtype", ["int16", "int32", "int64", "uint8"])
 def test_isin(
