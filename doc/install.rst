@@ -33,17 +33,16 @@ Installing the latest release
 .. div:: install-instructions
 
   .. tab-set::
-    :class: tabs-os
 
-    .. tab-item:: Windows
-      :class-label: tab-4
+    .. tab-item:: pip
+      :class-label: tab-6
+      :sync: packager-pip
 
       .. tab-set::
-        :class: tabs-package-manager
 
-        .. tab-item:: pip
-          :class-label: tab-6
-          :sync: package-manager-pip
+        .. tab-item:: Windows
+          :class-label: tab-4
+          :sync: os-windows
 
           Install the 64-bit version of Python 3, for instance from the
           `official website <https://www.python.org/downloads/windows/>`__.
@@ -67,21 +66,9 @@ Installing the latest release
             python -m pip freeze             # show all installed packages in the environment
             python -c "import sklearn; sklearn.show_versions()"
 
-        .. tab-item:: conda
-          :class-label: tab-6
-          :sync: package-manager-conda
-
-          .. include:: ./install_instructions_conda.rst
-
-    .. tab-item:: MacOS
-      :class-label: tab-4
-
-      .. tab-set::
-        :class: tabs-package-manager
-
-        .. tab-item:: pip
-          :class-label: tab-6
-          :sync: package-manager-pip
+        .. tab-item:: macOS
+          :class-label: tab-4
+          :sync: os-macos
 
           Install Python 3 using `homebrew <https://brew.sh/>`_ (`brew install python`)
           or by manually installing the package from the `official website
@@ -106,21 +93,9 @@ Installing the latest release
             python -m pip freeze             # show all installed packages in the environment
             python -c "import sklearn; sklearn.show_versions()"
 
-        .. tab-item:: conda
-          :class-label: tab-6
-          :sync: package-manager-conda
-
-          .. include:: ./install_instructions_conda.rst
-
-    .. tab-item:: Linux
-      :class-label: tab-4
-
-      .. tab-set::
-        :class: tabs-package-manager
-
-        .. tab-item:: pip
-          :class-label: tab-6
-          :sync: package-manager-pip
+        .. tab-item:: Linux
+          :class-label: tab-4
+          :sync: os-linux
 
           Python 3 is usually installed by default on most Linux distributions. To
           check if you have it installed, try:
@@ -152,12 +127,28 @@ Installing the latest release
             python3 -m pip freeze             # show all installed packages in the environment
             python3 -c "import sklearn; sklearn.show_versions()"
 
-        .. tab-item:: conda
-          :class-label: tab-6
-          :sync: package-manager-conda
+    .. tab-item:: conda
+      :class-label: tab-6
+      :sync: packager-conda
 
-          .. include:: ./install_instructions_conda.rst
+      Install conda using the `Anaconda or miniconda installers
+      <https://docs.conda.io/projects/conda/en/latest/user-guide/install/>`__
+      or the `miniforge installers
+      <https://github.com/conda-forge/miniforge#miniforge>`__ (no administrator
+      permission required for any of those). Then run:
 
+      .. prompt:: bash
+
+        conda create -n sklearn-env -c conda-forge scikit-learn
+        conda activate sklearn-env
+
+      In order to check your installation, you can use:
+
+      .. prompt:: bash
+
+        conda list scikit-learn  # show scikit-learn version and location
+        conda list               # show all installed packages in the environment
+        python -c "import sklearn; sklearn.show_versions()"
 
 Using an isolated environment such as pip venv or conda makes it possible to
 install a specific version of scikit-learn with pip or conda and its dependencies
