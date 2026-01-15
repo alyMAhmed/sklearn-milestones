@@ -22,14 +22,11 @@ from sklearn.utils import check_random_state
 from sklearn.utils.validation import validate_data
 
 rng = check_random_state(0)
-# Load and shuffle the iris dataset.
+# load and shuffle iris dataset
 iris = load_iris()
 perm = rng.permutation(iris.target.size)
 iris_data = iris.data[perm]
 iris_target = iris.target[perm]
-# Avoid having test data introducing dependencies between tests.
-iris_data.flags.writeable = False
-iris_target.flags.writeable = False
 EPS = np.finfo(float).eps
 
 
@@ -417,8 +414,8 @@ def test_no_verbose(capsys):
 
 
 def test_singleton_class():
-    X = iris_data.copy()
-    y = iris_target.copy()
+    X = iris_data
+    y = iris_target
 
     # one singleton class
     singleton_class = 1
