@@ -2538,3 +2538,20 @@ def _to_object_array(sequence):
     out = np.empty(len(sequence), dtype=object)
     out[:] = sequence
     return out
+
+# [ENV-PATCH] Stub functions for compatibility
+def _estimator_has(attr):
+    """Stub function for _estimator_has."""
+    def check(self):
+        return callable(getattr(self.estimator, attr, None))
+    return check
+
+def validate_data(estimator, X, y=None, **kwargs):
+    """Stub function for validate_data - delegates to check_array."""
+    reset = kwargs.pop("reset", True)
+    if y is None:
+        return check_array(X, **kwargs)
+    else:
+        X = check_array(X, **kwargs)
+        y = check_array(y, ensure_2d=False, **{k:v for k,v in kwargs.items() if k != "ensure_2d"})
+        return X, y
