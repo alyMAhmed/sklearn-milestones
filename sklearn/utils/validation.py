@@ -89,7 +89,7 @@ def _assert_all_finite(
 ):
     """Like assert_all_finite, but only for ndarray."""
 
-    xp, _ = get_namespace(X)
+    xp, is_array_api = get_namespace(X)
 
     if _get_config()["assume_finite"]:
         return
@@ -97,7 +97,7 @@ def _assert_all_finite(
     X = xp.asarray(X)
 
     # for object dtype data, we only check for NaNs (GH-13254)
-    if X.dtype == np.dtype("object") and not allow_nan:
+    if not is_array_api and X.dtype == np.dtype("object") and not allow_nan:
         if _object_dtype_isnan(X).any():
             raise ValueError("Input contains NaN")
 
@@ -479,7 +479,7 @@ def indexable(*iterables):
 
     Checks consistent length, passes through None, and ensures that everything
     can be indexed by converting sparse matrices to csr and converting
-    non-interable objects to arrays.
+    non-iterable objects to arrays.
 
     Parameters
     ----------
