@@ -1,3 +1,2 @@
-- :class:`preprocessing.MinMaxScaler` with `clip=True` now supports Array API
-  compatible inputs.
+- :class:`preprocessing.MinMaxScaler` with `clip=True`.
   By :user:`Shreekant Nandiyawar <Shree7676>`
