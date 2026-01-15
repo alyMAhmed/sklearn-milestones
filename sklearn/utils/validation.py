@@ -1,16 +1,7 @@
-"""
-The :mod:`sklearn.utils.validation` module includes functions to validate
-input and parameters within scikit-learn estimators.
-"""
+"""Functions to validate input and parameters within scikit-learn estimators."""
 
-# Authors: Olivier Grisel
-#          Gael Varoquaux
-#          Andreas Mueller
-#          Lars Buitinck
-#          Alexandre Gramfort
-#          Nicolas Tresegnie
-#          Sylvain Marie
-# License: BSD 3 clause
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 
 import numbers
 import operator
@@ -510,7 +501,7 @@ def indexable(*iterables):
     ...     [1, 2, 3], np.array([2, 3, 4]), None, csr_matrix([[5], [6], [7]])
     ... ]
     >>> indexable(*iterables)
-    [[1, 2, 3], array([2, 3, 4]), None, <3x1 sparse matrix ...>]
+    [[1, 2, 3], array([2, 3, 4]), None, <...Sparse...dtype 'int64'...shape (3, 1)>]
     """
 
     result = [_make_indexable(X) for X in iterables]
@@ -1473,8 +1464,8 @@ def check_symmetric(array, *, tol=1e-10, raise_warning=True, raise_exception=Fal
     >>> from scipy.sparse import csr_matrix
     >>> sparse_symmetric_array = csr_matrix(symmetric_array)
     >>> check_symmetric(sparse_symmetric_array)
-    <3x3 sparse matrix of type '<class 'numpy.int64'>'
-        with 6 stored elements in Compressed Sparse Row format>
+    <Compressed Sparse Row sparse matrix of dtype 'int64'
+        with 6 stored elements and shape (3, 3)>
     """
     if (array.ndim != 2) or (array.shape[0] != array.shape[1]):
         raise ValueError(

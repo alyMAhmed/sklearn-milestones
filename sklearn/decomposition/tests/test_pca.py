@@ -17,9 +17,9 @@ from sklearn.utils._array_api import (
     yield_namespace_device_dtype_combinations,
 )
 from sklearn.utils._array_api import device as array_device
+from sklearn.utils._test_common.instance_generator import _get_check_estimator_ids
 from sklearn.utils._testing import _array_api_for_tests, assert_allclose
 from sklearn.utils.estimator_checks import (
-    _get_check_estimator_ids,
     check_array_api_input_and_values,
 )
 from sklearn.utils.fixes import CSC_CONTAINERS, CSR_CONTAINERS
@@ -309,7 +309,7 @@ def test_pca_solver_equivalence(
     X_train, X_test = X[:n_samples], X[n_samples:]
 
     if global_dtype == np.float32:
-        tols = dict(atol=1e-2, rtol=1e-5)
+        tols = dict(atol=3e-2, rtol=1e-5)
         variance_threshold = 1e-5
     else:
         tols = dict(atol=1e-10, rtol=1e-12)

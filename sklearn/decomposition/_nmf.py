@@ -1,10 +1,7 @@
 """Non-negative matrix factorization."""
 
-# Author: Vlad Niculae
-#         Lars Buitinck
-#         Mathieu Blondel <mathieu@mblondel.org>
-#         Tom Dupre la Tour
-# License: BSD 3 clause
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 
 import itertools
 import time
@@ -27,7 +24,6 @@ from ..base import (
 from ..exceptions import ConvergenceWarning
 from ..utils import check_array, check_random_state, gen_batches, metadata_routing
 from ..utils._param_validation import (
-    Hidden,
     Interval,
     StrOptions,
     validate_params,
@@ -910,7 +906,7 @@ def non_negative_factorization(
     X,
     W=None,
     H=None,
-    n_components="warn",
+    n_components="auto",
     *,
     init=None,
     update_H=True,
@@ -983,14 +979,16 @@ def non_negative_factorization(
         If `update_H=False`, it is used as a constant, to solve for W only.
         If `None`, uses the initialisation method specified in `init`.
 
-    n_components : int or {'auto'} or None, default=None
-        Number of components, if n_components is not set all features
-        are kept.
+    n_components : int or {'auto'} or None, default='auto'
+        Number of components. If `None`, all features are kept.
         If `n_components='auto'`, the number of components is automatically inferred
         from `W` or `H` shapes.
 
         .. versionchanged:: 1.4
             Added `'auto'` value.
+
+        .. versionchanged:: 1.6
+            Default value changed from `None` to `'auto'`.
 
     init : {'random', 'nndsvd', 'nndsvda', 'nndsvdar', 'custom'}, default=None
         Method used to initialize the procedure.
@@ -1149,7 +1147,6 @@ class _BaseNMF(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator,
             Interval(Integral, 1, None, closed="left"),
             None,
             StrOptions({"auto"}),
-            Hidden(StrOptions({"warn"})),
         ],
         "init": [
             StrOptions({"random", "nndsvd", "nndsvda", "nndsvdar", "custom"}),
@@ -1170,7 +1167,7 @@ class _BaseNMF(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator,
 
     def __init__(
         self,
-        n_components="warn",
+        n_components="auto",
         *,
         init=None,
         beta_loss="frobenius",
@@ -1196,16 +1193,6 @@ class _BaseNMF(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator,
     def _check_params(self, X):
         # n_components
         self._n_components = self.n_components
-        if self.n_components == "warn":
-            warnings.warn(
-                (
-                    "The default value of `n_components` will change from `None` to"
-                    " `'auto'` in 1.6. Set the value of `n_components` to `None`"
-                    " explicitly to suppress the warning."
-                ),
-                FutureWarning,
-            )
-            self._n_components = None  # Keeping the old default value
         if self._n_components is None:
             self._n_components = X.shape[1]
 
@@ -1396,14 +1383,16 @@ class NMF(_BaseNMF):
 
     Parameters
     ----------
-    n_components : int or {'auto'} or None, default=None
-        Number of components, if n_components is not set all features
-        are kept.
+    n_components : int or {'auto'} or None, default='auto'
+        Number of components. If `None`, all features are kept.
         If `n_components='auto'`, the number of components is automatically inferred
         from W or H shapes.
 
         .. versionchanged:: 1.4
             Added `'auto'` value.
+
+        .. versionchanged:: 1.6
+            Default value changed from `None` to `'auto'`.
 
     init : {'random', 'nndsvd', 'nndsvda', 'nndsvdar', 'custom'}, default=None
         Method used to initialize the procedure.
@@ -1566,7 +1555,7 @@ class NMF(_BaseNMF):
 
     def __init__(
         self,
-        n_components="warn",
+        n_components="auto",
         *,
         init=None,
         solver="cd",
@@ -1834,14 +1823,16 @@ class MiniBatchNMF(_BaseNMF):
 
     Parameters
     ----------
-    n_components : int or {'auto'} or None, default=None
-        Number of components, if `n_components` is not set all features
-        are kept.
+    n_components : int or {'auto'} or None, default='auto'
+        Number of components. If `None`, all features are kept.
         If `n_components='auto'`, the number of components is automatically inferred
         from W or H shapes.
 
         .. versionchanged:: 1.4
             Added `'auto'` value.
+
+        .. versionchanged:: 1.6
+            Default value changed from `None` to `'auto'`.
 
     init : {'random', 'nndsvd', 'nndsvda', 'nndsvdar', 'custom'}, default=None
         Method used to initialize the procedure.
@@ -2006,7 +1997,7 @@ class MiniBatchNMF(_BaseNMF):
 
     def __init__(
         self,
-        n_components="warn",
+        n_components="auto",
         *,
         init=None,
         batch_size=1024,

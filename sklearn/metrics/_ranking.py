@@ -7,16 +7,8 @@ Function named as ``*_error`` or ``*_loss`` return a scalar value to minimize:
 the lower the better.
 """
 
-# Authors: Alexandre Gramfort <alexandre.gramfort@inria.fr>
-#          Mathieu Blondel <mathieu@mblondel.org>
-#          Olivier Grisel <olivier.grisel@ensta.org>
-#          Arnaud Joly <a.joly@ulg.ac.be>
-#          Jochen Wersdorfer <jochen@wersdoerfer.de>
-#          Lars Buitinck
-#          Joel Nothman <joel.nothman@gmail.com>
-#          Noel Dawe <noel@dawe.me>
-#          Michal Karbownik <michakarbownik@gmail.com>
-# License: BSD 3 clause
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 
 
 import warnings
@@ -232,8 +224,9 @@ def average_precision_score(
         )
         # Return the step function integral
         # The following works because the last entry of precision is
-        # guaranteed to be 1, as returned by precision_recall_curve
-        return -np.sum(np.diff(recall) * np.array(precision)[:-1])
+        # guaranteed to be 1, as returned by precision_recall_curve.
+        # Due to numerical error, we can get `-0.0` and we therefore clip it.
+        return max(0.0, -np.sum(np.diff(recall) * np.array(precision)[:-1]))
 
     y_type = type_of_target(y_true, input_name="y_true")
 
@@ -354,7 +347,7 @@ def det_curve(y_true, y_score, pos_label=None, sample_weight=None):
 
     if len(np.unique(y_true)) != 2:
         raise ValueError(
-            "Only one class present in y_true. Detection error "
+            "Only one class is present in y_true. Detection error "
             "tradeoff curve is not defined in that case."
         )
 
@@ -379,10 +372,15 @@ def det_curve(y_true, y_score, pos_label=None, sample_weight=None):
 def _binary_roc_auc_score(y_true, y_score, sample_weight=None, max_fpr=None):
     """Binary roc auc score."""
     if len(np.unique(y_true)) != 2:
-        raise ValueError(
-            "Only one class present in y_true. ROC AUC score "
-            "is not defined in that case."
+        warnings.warn(
+            (
+                "Only one class is present in y_true. ROC AUC score "
+                "is not defined in that case. The score is set to "
+                "0.0."
+            ),
+            UndefinedMetricWarning,
         )
+        return 0.0
 
     fpr, tpr, _ = roc_curve(y_true, y_score, sample_weight=sample_weight)
     if max_fpr is None or max_fpr == 1:

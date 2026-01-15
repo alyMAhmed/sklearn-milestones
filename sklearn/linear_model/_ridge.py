@@ -2,11 +2,8 @@
 Ridge regression
 """
 
-# Author: Mathieu Blondel <mathieu@mblondel.org>
-#         Reuben Fletcher-Costin <reuben.fletchercostin@gmail.com>
-#         Fabian Pedregosa <fabian@fseoane.net>
-#         Michael Eickenberg <michael.eickenberg@nsup.org>
-# License: BSD 3 clause
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 
 
 import numbers
@@ -810,7 +807,7 @@ def _ridge_regression(
             raise TypeError("SVD solver does not support sparse inputs currently")
         coef = _solve_svd(X, y, alpha, xp)
 
-    if ravel:
+    if n_targets == 1:
         coef = _ravel(coef)
 
     coef = xp.asarray(coef)
@@ -2187,6 +2184,8 @@ class _RidgeGCV(LinearModel):
         self.best_score_ = best_score
         self.dual_coef_ = best_coef
         self.coef_ = safe_sparse_dot(self.dual_coef_.T, X)
+        if y.ndim == 1 or y.shape[1] == 1:
+            self.coef_ = self.coef_.ravel()
 
         if sparse.issparse(X):
             X_offset = X_mean * X_scale
@@ -2242,12 +2241,7 @@ class _RidgeGCV(LinearModel):
                     ]
                 )
             else:
-                _score = scorer(
-                    identity_estimator,
-                    predictions.ravel(),
-                    y.ravel(),
-                    **score_params,
-                )
+                _score = scorer(identity_estimator, predictions, y, **score_params)
 
         return _score
 

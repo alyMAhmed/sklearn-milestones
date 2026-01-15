@@ -1,9 +1,8 @@
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 """
 Newton solver for Generalized Linear Models
 """
-
-# Author: Christian Lorentzen <lorentzen.ch@gmail.com>
-# License: BSD 3 clause
 
 import warnings
 from abc import ABC, abstractmethod
@@ -184,7 +183,7 @@ class NewtonSolver(ABC):
             method="L-BFGS-B",
             jac=True,
             options={
-                "maxiter": self.max_iter,
+                "maxiter": self.max_iter - self.iteration,
                 "maxls": 50,  # default is 20
                 "iprint": self.verbose - 1,
                 "gtol": self.tol,
@@ -192,7 +191,7 @@ class NewtonSolver(ABC):
             },
             args=(X, y, sample_weight, self.l2_reg_strength, self.n_threads),
         )
-        self.n_iter_ = _check_optimize_result("lbfgs", opt_res)
+        self.iteration += _check_optimize_result("lbfgs", opt_res)
         self.coef = opt_res.x
         self.converged = opt_res.status == 0
 
