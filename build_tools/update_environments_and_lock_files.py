@@ -7,7 +7,7 @@ Two scenarios where this script can be useful:
 - make sure that the latest versions of all the dependencies are used in the CI.
   There is a scheduled workflow that does this, see
   .github/workflows/update-lock-files.yml. This is still useful to run this
-  script when the automated PR fails and for example some packages need to
+  script when when the automated PR fails and for example some packages need to
   be pinned. You can add the pins to this script, run it, and open a PR with
   the changes.
 - bump minimum dependencies in sklearn/_min_dependencies.py. Running this
@@ -129,6 +129,7 @@ build_metadata_list = [
         ],
         "package_constraints": {
             "blas": "[build=mkl]",
+            "pytorch": "1.13",
         },
     },
     {
@@ -168,29 +169,33 @@ build_metadata_list = [
         },
         # TODO: put cython, threadpoolctl and meson-python back to conda
         # dependencies when required version is available on the main channel
-        "pip_dependencies": ["cython", "threadpoolctl", "meson-python", "meson"],
+        "pip_dependencies": ["cython", "threadpoolctl", "meson-python"],
     },
     {
-        "name": "pymin_conda_forge_openblas_min_dependencies",
+        "name": "pymin_conda_defaults_openblas",
         "type": "conda",
         "tag": "main-ci",
         "folder": "build_tools/azure",
         "platform": "linux-64",
-        "channels": ["conda-forge"],
-        "conda_dependencies": common_dependencies + ["ccache", "polars"],
+        "channels": ["defaults"],
+        "conda_dependencies": remove_from(
+            common_dependencies,
+            ["pandas", "threadpoolctl", "pip", "ninja", "meson-python"],
+        )
+        + ["ccache"],
         "package_constraints": {
             "python": "3.9",
             "blas": "[build=openblas]",
-            "numpy": "min",
-            "scipy": "min",
+            "numpy": "1.21",  # the min version is not available on the defaults channel
+            "scipy": "1.7",  # the min version has some low level crashes
             "matplotlib": "min",
             "cython": "min",
             "joblib": "min",
             "threadpoolctl": "min",
-            "meson-python": "min",
-            "pandas": "min",
-            "polars": "min",
         },
+        # TODO: put pip dependencies back to conda dependencies when required
+        # version is available on the defaults channel.
+        "pip_dependencies": ["threadpoolctl"],
     },
     {
         "name": "pymin_conda_forge_openblas_ubuntu_2204",
@@ -220,16 +225,10 @@ build_metadata_list = [
         "pip_dependencies": (
             remove_from(common_dependencies, ["python", "blas", "pip"])
             + docstring_test_dependencies
-            # Test with some optional dependencies
             + ["lightgbm", "scikit-image"]
-            # Test array API on CPU without PyTorch
-            + ["array-api-compat", "array-api-strict"]
         ),
         "package_constraints": {
-            # XXX: we would like to use the latest Python version, but for now using
-            # Python 3.12 makes the CI much slower so we use Python 3.11. See
-            # https://github.com/scikit-learn/scikit-learn/pull/29444#issuecomment-2219550662.
-            "python": "3.11",
+            "python": "3.9",
         },
     },
     {
@@ -368,6 +367,13 @@ build_metadata_list = [
         ],
         "package_constraints": {
             "python": "3.9",
+            # TODO: this needs to be adapted when matplotlib 3.11 is out. In
+            # the meantime, this avoids a warning in matplotlib 3.9 boxplot
+            # labels has been renamed to tick_labels. Possible options:
+            # - bump minimum matplotlib supported versions to 3.9 at one point
+            # - complicate the example code to do the right thing depending on
+            #   maplotlib version
+            "matplotlib": "<3.9",
         },
     },
     {
@@ -386,7 +392,7 @@ build_metadata_list = [
         },
     },
     {
-        "name": "debian_32bit",
+        "name": "debian_atlas_32bit",
         "type": "pip",
         "tag": "main-ci",
         "folder": "build_tools/azure",
@@ -399,9 +405,16 @@ build_metadata_list = [
             "ninja",
             "meson-python",
         ],
-        # Python version from the python3 APT package in the debian-32 docker
-        # image.
-        "python_version": "3.12.5",
+        "package_constraints": {
+            "joblib": "min",
+            "threadpoolctl": "3.1.0",
+            "pytest": "min",
+            "pytest-cov": "min",
+            # no pytest-xdist because it causes issue on 32bit
+            "cython": "min",
+        },
+        # same Python version as in debian-32 build
+        "python_version": "3.9.2",
     },
     {
         "name": "ubuntu_atlas",

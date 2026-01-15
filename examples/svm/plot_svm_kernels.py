@@ -36,7 +36,7 @@ linear kernel (`"linear"`), the polynomial kernel (`"poly"`), the radial basis f
 kernel (`"rbf"`) and the sigmoid kernel (`"sigmoid"`).
 """
 
-# Authors: The scikit-learn developers
+# Code source: Gaël Varoquaux
 # SPDX-License-Identifier: BSD-3-Clause
 
 # %%

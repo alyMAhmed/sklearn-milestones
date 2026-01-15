@@ -1,11 +1,10 @@
 .. _about:
 
-========
 About us
 ========
 
 History
-=======
+-------
 
 This project was started in 2007 as a Google Summer of Code project by
 David Cournapeau. Later that year, Matthieu Brucher started work on
@@ -20,9 +19,10 @@ copyright over the work done by people who were employed by INRIA at the
 time of the contribution.
 
 Governance
-==========
+----------
 
-The decision making process and governance structure of scikit-learn, like roles and responsibilities, is laid out in the :ref:`governance document <governance>`.
+The decision making process and governance structure of scikit-learn is laid
+out in the :ref:`governance document <governance>`.
 
 .. The "author" anchors below is there to ensure that old html links (in
    the form of "about.html#author" still work)
@@ -30,16 +30,13 @@ The decision making process and governance structure of scikit-learn, like roles
 .. _authors:
 
 The people behind scikit-learn
-==============================
+------------------------------
 
 Scikit-learn is a community project, developed by a large group of
-people, all across the world. A few core contributor teams, listed below, have
-central roles, however a more complete list of contributors can be found `on
+people, all across the world. A few teams, listed below, have central
+roles, however a more complete list of contributors can be found `on
 github
 <https://github.com/scikit-learn/scikit-learn/graphs/contributors>`__.
-
-Active Core Contributors
-------------------------
 
 Maintainers Team
 ................
@@ -84,11 +81,8 @@ The following people help with :ref:`communication around scikit-learn
 
 .. include:: communication_team.rst
 
-Emeritus Core Contributors
---------------------------
-
-Emeritus Maintainers Team
-.........................
+Emeritus Core Developers
+........................
 
 The following people have been active contributors in the past, but are no
 longer active in the project:
@@ -114,7 +108,7 @@ past:
 .. _citing-scikit-learn:
 
 Citing scikit-learn
-===================
+-------------------
 
 If you use scikit-learn in a scientific publication, we would appreciate
 citations to the following paper:
@@ -159,7 +153,7 @@ Bibtex entry::
   }
 
 Artwork
-=======
+-------
 
 High quality PNG and SVG logos are available in the `doc/logos/
 <https://github.com/scikit-learn/scikit-learn/tree/main/doc/logos>`_
@@ -169,7 +163,7 @@ source directory.
   :align: center
 
 Funding
-=======
+-------
 
 Scikit-learn is a community driven project, however institutional and private
 grants help to assure its sustainability.
@@ -298,35 +292,6 @@ The project would like to thank the following funders.
 
 ...........
 
-.. |czi| image:: images/czi.png
-  :target: https://chanzuckerberg.com
-
-.. |wellcome| image:: images/wellcome-trust.png
-  :target: https://wellcome.org/
-
-.. div:: sk-text-image-grid-small
-
-  .. div:: text-box
-
-    `The Chan-Zuckerberg Initiative <https://chanzuckerberg.com/>`_ and
-    `Wellcome Trust <https://wellcome.org/>`_ fund scikit-learn through the
-    `Essential Open Source Software for Science (EOSS) <https://chanzuckerberg.com/eoss/>`_
-    cycle 6.
-
-    It supports Lucy Liu and diversity & inclusion initiatives that will
-    be announced in the future.
-
-  .. div:: image-box
-
-    .. table::
-      :class: image-subtable
-
-      +----------+----------------+
-      |  |czi|   |    |wellcome|  |
-      +----------+----------------+
-
-...........
-
 .. div:: sk-text-image-grid-small
 
   .. div:: text-box
@@ -343,7 +308,7 @@ The project would like to thank the following funders.
 
 
 Past Sponsors
--------------
+.............
 
 .. div:: sk-text-image-grid-small
 
@@ -490,7 +455,7 @@ Past Sponsors
 
   .. div:: image-box
 
-    .. image:: images/czi.png
+    .. image:: images/czi_logo.svg
       :target: https://chanzuckerberg.com
 
 ......................
@@ -581,7 +546,7 @@ the past:
     |hf|
 
 Coding Sprints
-==============
+--------------
 
 The scikit-learn project has a long history of `open source coding sprints
 <https://blog.scikit-learn.org/events/sprints-value/>`_ with over 50 sprint
@@ -591,7 +556,7 @@ to costs which include venue, food, travel, developer time and more. See
 list of events.
 
 Donating to the project
-=======================
+-----------------------
 
 If you are interested in donating to the project or to one of our code-sprints,
 please donate via the `NumFOCUS Donations Page
@@ -624,7 +589,7 @@ project [#f1]_.
 
 
 Infrastructure support
-======================
+----------------------
 
 We would also like to thank `Microsoft Azure <https://azure.microsoft.com/en-us/>`_,
 `Cirrus Cl <https://cirrus-ci.org>`_, `CircleCl <https://circleci.com/>`_ for free CPU

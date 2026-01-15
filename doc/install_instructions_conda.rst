@@ -1,6 +1,7 @@
-Install conda using the
+Install conda using the `Anaconda or miniconda installers
+<https://docs.conda.io/projects/conda/en/latest/user-guide/install/>`__ or the
 `miniforge installers <https://github.com/conda-forge/miniforge#miniforge>`__ (no
-administrator permission required). Then run:
+administrator permission required for any of those). Then run:
 
 .. prompt:: bash
 

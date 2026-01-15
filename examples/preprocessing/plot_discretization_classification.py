@@ -28,7 +28,9 @@ set.
 
 """
 
-# Authors: The scikit-learn developers
+# Code source: Tom Dupré la Tour
+# Adapted from plot_classifier_comparison by Gaël Varoquaux and Andreas Müller
+#
 # SPDX-License-Identifier: BSD-3-Clause
 
 import matplotlib.pyplot as plt

@@ -4,7 +4,6 @@ Testing for Theil-Sen module (sklearn.linear_model.theil_sen)
 
 # Authors: The scikit-learn developers
 # SPDX-License-Identifier: BSD-3-Clause
-
 import os
 import re
 import sys
