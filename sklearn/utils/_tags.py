@@ -66,3 +66,32 @@ def _safe_tags(estimator, key=None):
             )
         return tags[key]
     return tags
+
+# [ENV-PATCH] Stub Tag classes for compatibility
+class _TagsBase:
+    """Base class for tag containers - stub."""
+    pass
+
+class ClassifierTags(_TagsBase):
+    """Stub class for ClassifierTags."""
+    pass
+
+class RegressorTags(_TagsBase):
+    """Stub class for RegressorTags."""
+    pass
+
+class TransformerTags(_TagsBase):
+    """Stub class for TransformerTags."""
+    pass
+
+class InputTags(_TagsBase):
+    """Stub class for InputTags."""
+    pass
+
+class TargetTags(_TagsBase):
+    """Stub class for TargetTags."""
+    pass
+
+def get_tags(estimator):
+    """Stub function for get_tags."""
+    return _safe_tags(estimator)
