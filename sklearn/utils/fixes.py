@@ -4,12 +4,8 @@ If you add content to this file, please give the version of the package
 at which the fix is no longer needed.
 """
 
-# Authors: Emmanuelle Gouillart <emmanuelle.gouillart@normalesup.org>
-#          Gael Varoquaux <gael.varoquaux@normalesup.org>
-#          Fabian Pedregosa <fpedregosa@acm.org>
-#          Lars Buitinck
-#
-# License: BSD 3 clause
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 
 import platform
 import struct

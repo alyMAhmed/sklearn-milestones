@@ -2,8 +2,8 @@
 The :mod:`sklearn.pls` module implements Partial Least Squares (PLS).
 """
 
-# Author: Edouard Duchesnay <edouard.duchesnay@cea.fr>
-# License: BSD 3 clause
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 
 import warnings
 from abc import ABCMeta, abstractmethod
@@ -282,7 +282,9 @@ class _PLS(
         # With PLSRegression n_components is bounded by the rank of (X.T X) see
         # Wegelin page 25. With CCA and PLSCanonical, n_components is bounded
         # by the rank of X and the rank of Y: see Wegelin page 12
-        rank_upper_bound = p if self.deflation_mode == "regression" else min(n, p, q)
+        rank_upper_bound = (
+            min(n, p) if self.deflation_mode == "regression" else min(n, p, q)
+        )
         if n_components > rank_upper_bound:
             raise ValueError(
                 f"`n_components` upper bound is {rank_upper_bound}. "

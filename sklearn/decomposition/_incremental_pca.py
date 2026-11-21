@@ -1,8 +1,7 @@
 """Incremental Principal Components Analysis."""
 
-# Author: Kyle Kastner <kastnerkyle@gmail.com>
-#         Giorgio Patrini
-# License: BSD 3 clause
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 
 from numbers import Integral
 
@@ -295,11 +294,11 @@ class IncrementalPCA(_BasePCA):
                 "more rows than columns for IncrementalPCA "
                 "processing" % (self.n_components, n_features)
             )
-        elif not self.n_components <= n_samples:
+        elif self.n_components > n_samples and first_pass:
             raise ValueError(
-                "n_components=%r must be less or equal to "
-                "the batch number of samples "
-                "%d." % (self.n_components, n_samples)
+                f"n_components={self.n_components} must be less or equal to "
+                f"the batch number of samples {n_samples} for the first "
+                "partial_fit call."
             )
         else:
             self.n_components_ = self.n_components
