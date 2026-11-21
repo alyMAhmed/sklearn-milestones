@@ -1,5 +1,5 @@
-# Author: Gael Varoquaux
-# License: BSD 3 clause
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 
 import pickle
 import re
@@ -18,14 +18,9 @@ from sklearn.base import (
     TransformerMixin,
     clone,
     is_classifier,
+    is_clusterer,
     is_regressor,
 )
-
-# [ENV-PATCH] Conditional import for is_clusterer - may not exist in all versions
-try:
-    from sklearn.base import is_clusterer
-except ImportError:
-    is_clusterer = None
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.exceptions import InconsistentVersionWarning
@@ -314,7 +309,6 @@ def test_is_regressor(estimator, expected_result):
         (Pipeline([("svc_cv", GridSearchCV(SVC(), {"C": [0.1, 1]}))]), False),
     ],
 )
-@pytest.mark.skipif(is_clusterer is None, reason="[ENV-PATCH] is_clusterer not available in this version")
 def test_is_clusterer(estimator, expected_result):
     assert is_clusterer(estimator) == expected_result
 
