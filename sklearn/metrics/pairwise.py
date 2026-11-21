@@ -21,6 +21,11 @@ from ..utils import (
     gen_batches,
     gen_even_slices,
 )
+from ..utils._array_api import (
+    _find_matching_floating_dtype,
+    _is_numpy_namespace,
+    get_namespace,
+)
 from ..utils._chunking import get_chunk_n_rows
 from ..utils._mask import _get_mask
 from ..utils._missing import is_scalar_nan
@@ -150,7 +155,11 @@ def check_pairwise_arrays(
         An array equal to Y if Y was not None, guaranteed to be a numpy array.
         If Y was None, safe_Y will be a pointer to X.
     """
-    X, Y, dtype_float = _return_float_dtype(X, Y)
+    xp, _ = get_namespace(X, Y)
+    if any([issparse(X), issparse(Y)]) or _is_numpy_namespace(xp):
+        X, Y, dtype_float = _return_float_dtype(X, Y)
+    else:
+        dtype_float = _find_matching_floating_dtype(X, Y, xp=xp)
 
     estimator = "check_pairwise_arrays"
     if dtype == "infer_float":
@@ -643,7 +652,6 @@ _VALID_METRICS = [
     "rogerstanimoto",
     "russellrao",
     "seuclidean",
-    "sokalmichener",
     "sokalsneath",
     "sqeuclidean",
     "yule",
@@ -651,6 +659,9 @@ _VALID_METRICS = [
     "nan_euclidean",
     "haversine",
 ]
+if sp_base_version < parse_version("1.17"):  # pragma: no cover
+    # Deprecated in SciPy 1.15 and removed in SciPy 1.17
+    _VALID_METRICS += ["sokalmichener"]
 if sp_base_version < parse_version("1.11"):  # pragma: no cover
     # Deprecated in SciPy 1.9 and removed in SciPy 1.11
     _VALID_METRICS += ["kulsinski"]
@@ -2366,10 +2377,12 @@ PAIRWISE_BOOLEAN_FUNCTIONS = [
     "jaccard",
     "rogerstanimoto",
     "russellrao",
-    "sokalmichener",
     "sokalsneath",
     "yule",
 ]
+if sp_base_version < parse_version("1.17"):
+    # Deprecated in SciPy 1.15 and removed in SciPy 1.17
+    PAIRWISE_BOOLEAN_FUNCTIONS += ["sokalmichener"]
 if sp_base_version < parse_version("1.11"):
     # Deprecated in SciPy 1.9 and removed in SciPy 1.11
     PAIRWISE_BOOLEAN_FUNCTIONS += ["kulsinski"]

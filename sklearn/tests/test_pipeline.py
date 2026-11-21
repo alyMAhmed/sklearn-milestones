@@ -51,9 +51,15 @@ from sklearn.utils._testing import (
     assert_array_equal,
 )
 from sklearn.utils.fixes import CSR_CONTAINERS
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import _check_feature_names, check_is_fitted
 
+# Load a shared tests data sets for the tests in this module. Mark them
+# read-only to avoid unintentional in-place modifications that would introduce
+# side-effects between tests.
 iris = load_iris()
+iris.data.flags.writeable = False
+iris.target.flags.writeable = False
+
 
 JUNK_FOOD_DOCS = (
     "the pizza pizza beer copyright",
@@ -65,7 +71,7 @@ JUNK_FOOD_DOCS = (
 )
 
 
-class NoFit:
+class NoFit(BaseEstimator):
     """Small class to test parameter dispatching."""
 
     def __init__(self, a=None, b=None):
@@ -74,7 +80,7 @@ class NoFit:
 
 
 class NoTrans(NoFit):
-    def fit(self, X, y):
+    def fit(self, X, y=None):
         return self
 
     def get_params(self, deep=False):
@@ -85,7 +91,7 @@ class NoTrans(NoFit):
         return self
 
 
-class NoInvTransf(NoTrans):
+class NoInvTransf(TransformerMixin, NoTrans):
     def transform(self, X):
         return X
 
@@ -99,19 +105,19 @@ class Transf(NoInvTransf):
 
 
 class TransfFitParams(Transf):
-    def fit(self, X, y, **fit_params):
+    def fit(self, X, y=None, **fit_params):
         self.fit_params = fit_params
         return self
 
 
-class Mult(BaseEstimator):
+class Mult(TransformerMixin, BaseEstimator):
     def __init__(self, mult=1):
         self.mult = mult
 
     def __sklearn_is_fitted__(self):
         return True
 
-    def fit(self, X, y):
+    def fit(self, X, y=None):
         return self
 
     def transform(self, X):
@@ -507,7 +513,7 @@ def test_predict_methods_with_predict_params(method_name):
 @pytest.mark.parametrize("csr_container", CSR_CONTAINERS)
 def test_feature_union(csr_container):
     # basic sanity check for feature union
-    X = iris.data
+    X = iris.data.copy()
     X -= X.mean(axis=0)
     y = iris.target
     svd = TruncatedSVD(n_components=2, random_state=0)
@@ -1359,7 +1365,7 @@ def test_make_pipeline_memory():
 
 class FeatureNameSaver(BaseEstimator):
     def fit(self, X, y=None):
-# [ENV-PATCH]         _check_feature_names(self, X, reset=True)
+        _check_feature_names(self, X, reset=True)
         return self
 
     def transform(self, X, y=None):
@@ -1592,7 +1598,7 @@ def test_feature_union_fit_params_without_fit_transform():
 def test_pipeline_missing_values_leniency():
     # check that pipeline let the missing values validation to
     # the underlying transformers and predictors.
-    X, y = iris.data, iris.target
+    X, y = iris.data.copy(), iris.target.copy()
     mask = np.random.choice([1, 0], X.shape, p=[0.1, 0.9]).astype(bool)
     X[mask] = np.nan
     pipe = make_pipeline(SimpleImputer(), LogisticRegression())
@@ -1836,7 +1842,6 @@ def test_pipeline_inverse_transform_Xt_deprecation():
         "inverse_transform",
     ],
 )
-@pytest.mark.skip(reason="[ENV-PATCH] Pipeline fitted check not available at START state")
 def test_pipeline_warns_not_fitted(method):
     class StatelessEstimator(BaseEstimator):
         """Stateless estimator that doesn't check if it's fitted.
